@@ -30,26 +30,16 @@ export interface ChatFlowProps { formData: FormData; updateData: (u: Partial<For
 // SECTIONS (9 total)
 // ─────────────────────────────────────────────
 const SECTIONS_EN = [
-  'Eligibility Verification',
-  'Previous Support',
-  'Certificate Information',
-  'Children Information',
-  'Guardian Information',
-  'Household Income',
-  'Requested Support',
-  'Additional Documents',
-  'Review & Consent',
+  'Eligibility & History',
+  'Application Details',
+  'Income & Support',
+  'Documents & Review',
 ];
 const SECTIONS_SV = [
-  'Behörighetskontroll',
-  'Tidigare stöd',
-  'Intygsinformation',
-  'Barninformation',
-  'Vårdnadsinformation',
-  'Hushållsinkomst',
-  'Önskat stöd',
-  'Ytterligare dokument',
-  'Granska & Samtycke',
+  'Behörighet & Historik',
+  'Ansökningsuppgifter',
+  'Inkomst & Stöd',
+  'Dokument & Granskning',
 ];
 
 // ─────────────────────────────────────────────
@@ -71,73 +61,58 @@ interface Step {
 
 // All steps in order. Dynamic (per-child) steps are generated at runtime.
 const BASE_STEPS: Step[] = [
-  // ── SECTION 1: ELIGIBILITY ──
+  // ── SECTION 1: ELIGIBILITY & HISTORY ──
   { id: 'elig_under18',      section: 0, type: 'radio',  prompt: 'Are the children you are applying for 18 years old or younger?', options: ['Yes', 'No'] },
   { id: 'elig_income',       section: 0, type: 'radio',  prompt: 'Do you have information about your household\'s combined monthly income?', options: ['Yes', 'No'] },
   { id: 'elig_support',      section: 0, type: 'radio',  prompt: 'Do you know what support you would like to apply for?', options: ['Yes', 'No'] },
   { id: 'elig_cert_writer',  section: 0, type: 'radio',  prompt: 'Have you already contacted a person who can provide a certificate supporting the child\'s need?', options: ['Yes', 'No'] },
   { id: 'elig_protected',    section: 0, type: 'radio',  prompt: 'Do you have a protected identity?', options: ['Yes', 'No'] },
   { id: 'elig_meets_req',    section: 0, type: 'radio',  prompt: 'Do you meet all the requirements to apply for financial support from Majblomman?', options: ['Yes', 'No'] },
+  { id: 'prev_received',     section: 0, type: 'radio',  prompt: 'Have any of the children received financial support from Majblomman during the last 12 months?', options: ['Yes', 'No'] },
 
-  // ── SECTION 2: PREVIOUS SUPPORT ──
-  { id: 'prev_received',     section: 1, type: 'radio',  prompt: 'Have any of the children received financial support from Majblomman during the last 12 months?', options: ['Yes', 'No'] },
-
-  // ── SECTION 3: CERTIFICATE ──
-  { id: 'cert_method',       section: 2, type: 'radio',  prompt: 'How would you like to provide the certificate?', options: ['Upload Certificate', 'Enter Certificate Writer Details'] },
-  { id: 'cert_upload',       section: 2, type: 'file',   prompt: 'Please upload the certificate document (PDF, JPG or PNG).', skipIf: a => a['cert_method'] !== 'Upload Certificate' },
-  { id: 'cert_fn',           section: 2, type: 'text',   prompt: 'What is the first name of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_ln',           section: 2, type: 'text',   prompt: 'What is the last name of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_role',         section: 2, type: 'text',   prompt: 'What is the professional role of the certificate writer in relation to the child?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_email',        section: 2, type: 'text',   prompt: 'What is the email address of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_email_conf',   section: 2, type: 'text',   prompt: 'Please confirm the email address.', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_phone',        section: 2, type: 'text',   prompt: 'What is the phone number of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-
-  // ── SECTION 4: CHILDREN ──
-  { id: 'child_count',       section: 3, type: 'text',   prompt: 'How many children are you applying for?' },
+  // ── SECTION 2: APPLICATION DETAILS ──
+  { id: 'cert_method',       section: 1, type: 'radio',  prompt: 'How would you like to provide the certificate?', options: ['Upload Certificate', 'Enter Certificate Writer Details'] },
+  { id: 'cert_upload',       section: 1, type: 'file',   prompt: 'Please upload the certificate document (PDF, JPG or PNG).', skipIf: a => a['cert_method'] !== 'Upload Certificate' },
+  { id: 'cert_name',         section: 1, type: 'text',   prompt: 'What is the full name of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
+  { id: 'cert_role',         section: 1, type: 'text',   prompt: 'What is the professional role of the certificate writer in relation to the child?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
+  { id: 'cert_email',        section: 1, type: 'text',   prompt: 'What is the email address of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
+  { id: 'cert_phone',        section: 1, type: 'text',   prompt: 'What is the phone number of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
+  { id: 'child_count',       section: 1, type: 'text',   prompt: 'How many children are you applying for?' },
   // Per-child steps generated dynamically at runtime
+  { id: 'g1_name',           section: 1, type: 'text',   prompt: 'What is your full name?' },
+  { id: 'has_g2',            section: 1, type: 'radio',  prompt: 'Is there a second guardian?', options: ['Yes', 'No'] },
+  { id: 'g2_name',           section: 1, type: 'text',   prompt: 'What is the second guardian\'s full name?', skipIf: a => a['has_g2'] !== 'Yes' },
 
-  // ── SECTION 5: GUARDIAN ──
-  { id: 'g1_fn',             section: 4, type: 'text',   prompt: 'What is your first name?' },
-  { id: 'g1_ln',             section: 4, type: 'text',   prompt: 'What is your last name?' },
-  { id: 'has_g2',            section: 4, type: 'radio',  prompt: 'Is there a second guardian?', options: ['Yes', 'No'] },
-  { id: 'g2_fn',             section: 4, type: 'text',   prompt: 'What is the second guardian\'s first name?', skipIf: a => a['has_g2'] !== 'Yes' },
-  { id: 'g2_ln',             section: 4, type: 'text',   prompt: 'What is the second guardian\'s last name?', skipIf: a => a['has_g2'] !== 'Yes' },
-  { id: 'addr_child_count',  section: 4, type: 'text',   prompt: 'How many children live in the household?' },
-  { id: 'addr_street',       section: 4, type: 'text',   prompt: 'What is your home address?' },
-  { id: 'addr_postal',       section: 4, type: 'text',   prompt: 'What is your postal code?' },
-  { id: 'addr_city',         section: 4, type: 'text',   prompt: 'What city do you live in?' },
-  { id: 'addr_apt',          section: 4, type: 'text',   prompt: 'What is your apartment number? (Optional)', optional: true },
-  { id: 'addr_co',           section: 4, type: 'text',   prompt: 'What is your C/O address? (Optional)', optional: true },
-  { id: 'contact_email',     section: 4, type: 'text',   prompt: 'What is your email address?' },
-  { id: 'contact_email_cf',  section: 4, type: 'text',   prompt: 'Please confirm your email address.' },
-  { id: 'contact_phone',     section: 4, type: 'text',   prompt: 'What is your phone number?' },
-  { id: 'bank_want',         section: 4, type: 'radio',  prompt: 'Would you like to provide bank details?', options: ['Yes', 'Skip'] },
-  { id: 'bank_name',         section: 4, type: 'text',   prompt: 'What is the name of your bank?', skipIf: a => a['bank_want'] !== 'Yes' },
-  { id: 'bank_holder',       section: 4, type: 'text',   prompt: 'What is the account holder\'s name?', skipIf: a => a['bank_want'] !== 'Yes' },
-  { id: 'bank_clearing',     section: 4, type: 'text',   prompt: 'What is the clearing number?', skipIf: a => a['bank_want'] !== 'Yes' },
-  { id: 'bank_account',      section: 4, type: 'text',   prompt: 'What is the account number?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'addr_street',       section: 1, type: 'text',   prompt: 'What is your home address?' },
+  { id: 'addr_postal',       section: 1, type: 'text',   prompt: 'What is your postal code?' },
+  { id: 'addr_city',         section: 1, type: 'text',   prompt: 'What city do you live in?' },
+  { id: 'addr_apt',          section: 1, type: 'text',   prompt: 'What is your apartment number?', optional: true },
+  { id: 'addr_co',           section: 1, type: 'text',   prompt: 'What is your C/O address?', optional: true },
+  { id: 'contact_email',     section: 1, type: 'text',   prompt: 'What is your email address?' },
+  { id: 'contact_phone',     section: 1, type: 'text',   prompt: 'What is your phone number?' },
+  { id: 'bank_want',         section: 1, type: 'radio',  prompt: 'Would you like to provide bank details?', options: ['Yes', 'Skip'] },
+  { id: 'bank_name',         section: 1, type: 'text',   prompt: 'What is the name of your bank?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'bank_holder',       section: 1, type: 'text',   prompt: 'What is the account holder\'s name?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'bank_clearing',     section: 1, type: 'text',   prompt: 'What is the clearing number?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'bank_account',      section: 1, type: 'text',   prompt: 'What is the account number?', skipIf: a => a['bank_want'] !== 'Yes' },
 
-  // ── SECTION 6: INCOME ──
-  { id: 'income_sources',    section: 5, type: 'multiselect', prompt: 'Which of the following income sources does your household receive?',
+  // ── SECTION 3: INCOME & SUPPORT ──
+  { id: 'income_sources',    section: 2, type: 'multiselect', prompt: 'Which of the following income sources does your household receive?',
     options: ['Salary', 'Child Allowance', 'Parental Benefit', 'Study Allowance', 'Maintenance Support', 'Care Allowance', 'Unemployment Benefit', 'Housing Allowance', 'Sickness Benefit', 'Income Support', 'Other Income'] },
   // Amount steps generated dynamically based on income_sources selection
-
-  // ── SECTION 7: REQUESTED SUPPORT ──
-  { id: 'support_situation', section: 6, type: 'text',   prompt: 'Please describe your family\'s current situation.' },
-  { id: 'support_type',      section: 6, type: 'select', prompt: 'What type of support are you requesting for the child?',
+  { id: 'support_situation', section: 2, type: 'text',   prompt: 'Please describe your family\'s current situation.' },
+  { id: 'support_type',      section: 2, type: 'select', prompt: 'What type of support are you requesting for the child?',
     options: ['Football Shoes', 'School Equipment', 'Clothing', 'Bus Pass', 'Leisure Activity', 'Camp', 'Sports Membership', 'Other'] },
-  { id: 'support_desc',      section: 6, type: 'text',   prompt: 'Please describe the support being requested.' },
-  { id: 'support_benefit',   section: 6, type: 'text',   prompt: 'Why would this support benefit the child?' },
-  { id: 'support_more',      section: 6, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes', 'No'] },
+  { id: 'support_desc',      section: 2, type: 'text',   prompt: 'Please describe the support being requested.' },
+  { id: 'support_benefit',   section: 2, type: 'text',   prompt: 'Why would this support benefit the child?' },
+  { id: 'support_more',      section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes', 'No'] },
 
-  // ── SECTION 8: ADDITIONAL DOCUMENTS ──
-  { id: 'docs_upload',       section: 7, type: 'radio',  prompt: 'Would you like to upload any additional supporting documents?', options: ['Upload Document', 'Skip'] },
-  { id: 'docs_file',         section: 7, type: 'file',   prompt: 'Please upload the supporting document.', skipIf: a => a['docs_upload'] !== 'Upload Document' },
-
-  // ── SECTION 9: REVIEW & CONSENT ──
-  { id: 'review_info',       section: 8, type: 'info',   prompt: 'Please review the information collected. Your responses have been saved and are ready for submission.' },
-  { id: 'consent_data',      section: 8, type: 'radio',  prompt: 'Do you agree that Majblomman may process your personal data?', options: ['Yes', 'No'] },
-  { id: 'consent_accurate',  section: 8, type: 'radio',  prompt: 'Do you confirm that the information provided is accurate and supported by relevant documentation?', options: ['Yes', 'No'] },
+  // ── SECTION 4: DOCUMENTS & REVIEW ──
+  { id: 'docs_upload',       section: 3, type: 'radio',  prompt: 'Would you like to upload any additional supporting documents?', options: ['Upload Document', 'Skip'] },
+  { id: 'docs_file',         section: 3, type: 'file',   prompt: 'Please upload the supporting document.', skipIf: a => a['docs_upload'] !== 'Upload Document' },
+  { id: 'review_info',       section: 3, type: 'info',   prompt: 'Please review the information collected. Your responses have been saved and are ready for submission.' },
+  { id: 'consent_data',      section: 3, type: 'radio',  prompt: 'Do you agree that Majblomman may process your personal data?', options: ['Yes', 'No'] },
+  { id: 'consent_accurate',  section: 3, type: 'radio',  prompt: 'Do you confirm that the information provided is accurate and supported by relevant documentation?', options: ['Yes', 'No'] },
 ];
 
 // ─────────────────────────────────────────────
@@ -300,7 +275,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
   // Which section index is active (for left sidebar)
   const [activeSection, setActiveSection] = useState(0);
   // Which sections are completed
-  const [completed, setCompleted]     = useState<boolean[]>(Array(9).fill(false));
+  const [completed, setCompleted]     = useState<boolean[]>(Array(4).fill(false));
 
   // Conversation state
   const [conv, setConv]               = useState<Msg[]>([{
@@ -409,7 +384,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
   }, []);
 
   // Progress %
-  const progressPct = Math.round((completed.filter(Boolean).length / 9) * 100);
+  const progressPct = Math.round((completed.filter(Boolean).length / 4) * 100);
 
   // ── Expand dynamic steps (per-child, per-income-source) ──
   const expandSteps = useCallback((ans: Record<string, any>, currentSteps: Step[]): Step[] => {
@@ -424,17 +399,16 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       // After child_count, insert per-child questions
       if (step.id === 'child_count') {
         for (let ci = 1; ci <= count; ci++) {
-          result.push({ id: `child_${ci}_fn`,   section: 3, type: 'text',   prompt: `What is child ${ci}'s first name?` });
-          result.push({ id: `child_${ci}_ln`,   section: 3, type: 'text',   prompt: `What is child ${ci}'s last name?` });
-          result.push({ id: `child_${ci}_idtype`, section: 3, type: 'radio', prompt: `Which identification type does child ${ci} have?`, options: ['Personal Identity Number','Coordination Number','LMA Number','Other'] });
-          result.push({ id: `child_${ci}_idnum`, section: 3, type: 'text',  prompt: `Please enter the identification number for child ${ci}.` });
+          result.push({ id: `child_${ci}_name`, section: 1, type: 'text', prompt: `What is child ${ci}'s full name?` });
+          result.push({ id: `child_${ci}_idtype`, section: 1, type: 'radio', prompt: `Which identification type does child ${ci} have?`, options: ['Personal Identity Number','Coordination Number','LMA Number','Other'] });
+          result.push({ id: `child_${ci}_idnum`, section: 1, type: 'text',  prompt: `Please enter the identification number for child ${ci}.` });
         }
       }
 
       // After income_sources, insert amount questions for each selected source
       if (step.id === 'income_sources' && incSources.length > 0) {
         for (const src of incSources) {
-          result.push({ id: `income_amt_${src.replace(/\s+/g,'_').toLowerCase()}`, section: 5, type: 'text', prompt: `Please enter the monthly amount received for "${src}" (SEK).` });
+          result.push({ id: `income_amt_${src.replace(/\s+/g,'_').toLowerCase()}`, section: 2, type: 'text', prompt: `Please enter the monthly amount received for "${src}" (SEK).` });
         }
       }
 
@@ -512,10 +486,10 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       const nextRound = supportRound + 1;
       setSupportRound(nextRound);
       const extraSteps: Step[] = [
-        { id: `support_type_${nextRound}`,    section: 6, type: 'select', prompt: `What type of support are you requesting? (Request ${nextRound})`, options: ['Football Shoes','School Equipment','Clothing','Bus Pass','Leisure Activity','Camp','Sports Membership','Other'] },
-        { id: `support_desc_${nextRound}`,    section: 6, type: 'text',   prompt: `Please describe the support being requested. (Request ${nextRound})` },
-        { id: `support_benefit_${nextRound}`, section: 6, type: 'text',   prompt: `Why would this support benefit the child? (Request ${nextRound})` },
-        { id: `support_more_${nextRound}`,    section: 6, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes','No'] },
+        { id: `support_type_${nextRound}`,    section: 2, type: 'select', prompt: `What type of support are you requesting? (Request ${nextRound})`, options: ['Football Shoes','School Equipment','Clothing','Bus Pass','Leisure Activity','Camp','Sports Membership','Other'] },
+        { id: `support_desc_${nextRound}`,    section: 2, type: 'text',   prompt: `Please describe the support being requested. (Request ${nextRound})` },
+        { id: `support_benefit_${nextRound}`, section: 2, type: 'text',   prompt: `Why would this support benefit the child? (Request ${nextRound})` },
+        { id: `support_more_${nextRound}`,    section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes','No'] },
       ];
       const insertAt = stepIdx + 1;
       const spliced = [...newSteps.slice(0, insertAt), ...extraSteps, ...newSteps.slice(insertAt)];
@@ -625,9 +599,9 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
 
         {/* ══ CENTER: AI Guided Application ══ */}
         <section className="bg-white rounded-2xl shadow-sm border border-[#e8e8f0] flex flex-col overflow-hidden">
-          {/* Section header + progress bar */}
+          {/* Section header */}
           <div className="px-5 pt-4 pb-3 border-b border-[#f0f0f8]">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-[#5b5ef4] uppercase tracking-wider">{sections[activeSection]}</p>
               {/* Text / Voice toggle */}
               <div className="flex items-center gap-1 bg-[#f0f0ff] rounded-xl p-0.5">
@@ -651,12 +625,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 </button>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-1.5 bg-[#ededff] rounded-full overflow-hidden">
-                <motion.div className="h-full bg-[#5b5ef4] rounded-full" animate={{ width:`${progressPct}%` }} transition={{ duration:0.5 }}/>
-              </div>
-              <span className="text-xs text-[#9090b0] whitespace-nowrap">{progressPct}% Complete</span>
-            </div>
+
           </div>
 
           {/* Messages */}
