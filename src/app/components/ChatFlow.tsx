@@ -62,12 +62,7 @@ interface Step {
 // All steps in order. Dynamic (per-child) steps are generated at runtime.
 const BASE_STEPS: Step[] = [
   // ── SECTION 1: ELIGIBILITY & HISTORY ──
-  { id: 'elig_under18',      section: 0, type: 'radio',  prompt: 'Are the children you are applying for 18 years old or younger?', options: ['Yes', 'No'] },
-  { id: 'elig_income',       section: 0, type: 'radio',  prompt: 'Do you have information about your household\'s combined monthly income?', options: ['Yes', 'No'] },
-  { id: 'elig_support',      section: 0, type: 'radio',  prompt: 'Do you know what support you would like to apply for?', options: ['Yes', 'No'] },
-  { id: 'elig_cert_writer',  section: 0, type: 'radio',  prompt: 'Have you already contacted a person who can provide a certificate supporting the child\'s need?', options: ['Yes', 'No'] },
-  { id: 'elig_protected',    section: 0, type: 'radio',  prompt: 'Do you have a protected identity?', options: ['Yes', 'No'] },
-  { id: 'elig_meets_req',    section: 0, type: 'radio',  prompt: 'Do you meet all the requirements to apply for financial support from Majblomman?', options: ['Yes', 'No'] },
+
   { id: 'prev_received',     section: 0, type: 'radio',  prompt: 'Have any of the children received financial support from Majblomman during the last 12 months?', options: ['Yes', 'No'] },
 
   // ── SECTION 2: APPLICATION DETAILS ──
@@ -437,6 +432,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       return;
     }
 
+    setStepIdx(idx);
     setActiveSection(step.section);
     setTyping(true);
     setTimeout(() => {
@@ -454,6 +450,39 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     }, 750);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+
+
+  // ── Go Back ──
+  const goBack = useCallback(() => {
+    if (stepIdx <= 0 || conv.length < 2) return;
+    
+    let prevIdx = stepIdx - 1;
+    while (prevIdx >= 0) {
+      const step = steps[prevIdx];
+      if (!step.skipIf || !step.skipIf(answers)) {
+        break;
+      }
+      prevIdx--;
+    }
+    
+    if (prevIdx < 0) return;
+
+    setConv(prev => {
+      let lastUserIdx = -1;
+      for (let i = prev.length - 1; i >= 0; i--) {
+        if (prev[i].from === 'user') {
+          lastUserIdx = i;
+          break;
+        }
+      }
+      if (lastUserIdx === -1) return prev;
+      return prev.slice(0, lastUserIdx);
+    });
+
+    setStepIdx(prevIdx);
+    setActiveSection(steps[prevIdx].section);
+  }, [stepIdx, steps, answers, conv]);
 
   // ── Submit answer ──
   const submitAnswer = useCallback((value: string | string[], overrideSteps?: Step[]) => {
@@ -815,6 +844,21 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 className="w-full py-3 rounded-xl bg-[#22c55e] hover:bg-[#16a34a] text-white font-semibold text-[14px] transition-colors shadow-md shadow-green-500/25">
                 ✓ Submit Application
               </button>
+            )}
+
+            {/* Go Back Button */}
+            {stepIdx > 0 && (
+              <div className="flex justify-center pt-2">
+                <button 
+                  onClick={goBack}
+                  className="text-xs text-[#9090b0] hover:text-[#5b5ef4] transition-colors flex items-center gap-1"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                  Go back to previous step
+                </button>
+              </div>
             )}
           </div>
 

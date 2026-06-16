@@ -287,9 +287,91 @@ function SuccessScreen({ onReset, language }: { onReset: () => void; formData: F
   );
 }
 
+function EligibilityScreen({ onContinue }: { onContinue: () => void }) {
+  const [agreed, setAgreed] = useState(false);
+  const [showError, setShowError] = useState(false);
+  return (
+    <>
+      <div className="max-w-3xl mx-auto w-full px-4 pt-8 pb-12 flex flex-col gap-6">
+      <h2 className="text-center text-[#164E41] font-bold text-2xl mb-2" style={{ fontFamily: "Fraunces, Georgia, serif" }}>
+        Before applying for financial support for children
+      </h2>
+
+      <div className="bg-white rounded-xl shadow-sm border border-[#e8e8f0] p-8">
+        <h3 className="font-bold text-[#164E41] text-[15px] mb-2">Requirements to apply for financial support from Majblomman</h3>
+        <p className="text-sm font-bold text-[#1a1a2e] mb-4">All requirements must be met for the application to be approved</p>
+        <ul className="list-disc pl-5 text-sm text-[#4a4a5e] space-y-2 mb-6">
+          <li>The children I am applying for are 18 years old or younger</li>
+          <li>I have information about the family's combined income</li>
+          <li>I know what I want to apply for support for and can describe why the children need the support</li>
+          <li>I have contacted a person who can write a certificate to confirm the child's need</li>
+          <li>We do <strong>not</strong> have protected identity</li>
+        </ul>
+        <label className="flex items-start gap-3 cursor-pointer mt-4">
+          <input 
+            type="checkbox" 
+            className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#164E41] focus:ring-[#164E41]"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+          />
+          <span className="text-sm text-[#1a1a2e] font-medium">I meet all the requirements to apply for financial support from Majblomman</span>
+        </label>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-[#e8e8f0] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="font-bold text-[#1a1a2e] text-sm mb-1">Application in progress</h3>
+          <p className="text-sm text-[#6b7280]">
+            Have you already started an application?{' '}
+            <a href="#" className="text-[#164E41] underline font-medium hover:text-[#0f342c]">continue here</a>
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-[#e8e8f0] p-6">
+        <h3 className="font-bold text-[#1a1a2e] text-sm mb-1">Protected identity</h3>
+        <p className="text-sm text-[#6b7280]">
+          If you have a protected identity, use <a href="#" className="text-blue-600 underline hover:text-blue-800">this form</a>.
+        </p>
+      </div>
+
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={() => {
+            if (!agreed) setShowError(true);
+            else onContinue();
+          }}
+          className="px-10 py-3 rounded-full text-sm font-semibold transition-all bg-[#849a90] hover:bg-[#72887e] text-white shadow-md"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    {showError && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-8 flex flex-col items-start gap-4">
+          <h2 className="text-[#164E41] font-bold text-xl mb-1">You must fill in or change:</h2>
+          <ul className="list-disc pl-5 text-[#4a4a5e] text-[15px] space-y-2 mb-4">
+            <li>You must tick the box confirming that you meet all the requirements to apply for financial support.</li>
+          </ul>
+          <button
+            onClick={() => setShowError(false)}
+            className="ml-auto px-6 py-2 rounded-lg bg-[#2a685b] hover:bg-[#164E41] text-white font-medium transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    )}
+    </>
+  );
+}
+
 export default function App() {
   /* MARKER-MAKE-KIT-INVOKED */
   const [formData, setFormData] = useState<FormData>(initialData);
+  const [started, setStarted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [language, setLanguage] = useState<string>('en');
@@ -300,6 +382,7 @@ export default function App() {
     localStorage.removeItem('mjb_progress');
     localStorage.removeItem('majblomman_progress');
     setFormData(initialData);
+    setStarted(false);
     setSubmitted(false);
     setResetKey(prev => prev + 1);
     // Scroll back to the top of the page
@@ -377,6 +460,8 @@ export default function App() {
       <main className="flex-1 flex flex-col pt-3 z-10">
         {submitted ? (
           <SuccessScreen onReset={handleReset} formData={formData} language={language as 'en' | 'sv'} />
+        ) : !started ? (
+          <EligibilityScreen onContinue={() => setStarted(true)} />
         ) : (
           <ChatFlow 
             key={`${resetKey}-${language}`}
@@ -390,6 +475,19 @@ export default function App() {
 
       {/* Footer */}
       <footer className="z-10 py-3 text-center text-[12.5px] text-[#6b7280]">
+        {started && !submitted && (
+          <div className="mb-6 mt-4">
+            <button
+              onClick={() => setStarted(false)}
+              className="px-6 py-2.5 rounded-full bg-white border border-[#d0d0e8] text-[13px] font-semibold text-[#3a3a5c] hover:bg-[#f0f0ff] hover:border-[#5b5ef4] hover:text-[#5b5ef4] transition-all shadow-sm flex items-center gap-2 mx-auto"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              Go Back
+            </button>
+          </div>
+        )}
         Read more about requirements for financial support at{' '}
         <a
           href="https://majblomman.se/sok-stod/sok-har/"
