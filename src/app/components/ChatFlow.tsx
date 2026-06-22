@@ -63,51 +63,55 @@ interface Step {
 // All steps in order. Dynamic (per-child) steps are generated at runtime.
 const BASE_STEPS: Step[] = [
   // ── SECTION 1: ELIGIBILITY & HISTORY ──
-  { id: 'prev_received',     section: 0, type: 'radio',  prompt: 'Have any of the children received financial support from Majblomman during the last 12 months?', options: ['Yes', 'No'], helpText: '**Explanation:** We need to know if you have recently received support to prioritize new applicants.\n\n**Guidance:** Answer Yes if you received any financial aid from us since exactly one year ago today.' },
+  { id: 'prev_received', section: 0, type: 'radio', prompt: 'Have any of the children received financial support from Majblomman during the last 12 months?', options: ['Yes', 'No'], helpText: '**Explanation:** We need to know if you have recently received support to prioritize new applicants.\n\n**Guidance:** Answer Yes if you received any financial aid from us since exactly one year ago today.' },
 
   // ── SECTION 2: APPLICATION DETAILS ──
-  { id: 'cert_method',       section: 1, type: 'radio',  prompt: 'How would you like to provide the certificate?', options: ['Upload Certificate', 'Enter Certificate Writer Details'], helpText: '**Explanation:** A certificate from a professional (e.g., teacher, nurse, social worker) is required. You can upload a digital copy now, or provide their contact details so we can verify.' },
-  { id: 'cert_upload',       section: 1, type: 'file',   prompt: 'Please upload the certificate document (PDF, JPG or PNG).', skipIf: a => a['cert_method'] !== 'Upload Certificate', helpText: '**Format expected:** A clear image or PDF document. Max size 5MB.' },
-  { id: 'cert_name',         section: 1, type: 'text',   prompt: 'What is the full name of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Example:** Jane Doe' },
-  { id: 'cert_role',         section: 1, type: 'text',   prompt: 'What is the professional role of the certificate writer in relation to the child?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Example:** School Nurse, Teacher, Social Worker' },
-  { id: 'cert_email',        section: 1, type: 'text',   prompt: 'What is the email address of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Format:** name@example.com' },
-  { id: 'cert_phone',        section: 1, type: 'text',   prompt: 'What is the phone number of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Format:** 07X XXX XX XX' },
-  { id: 'child_count',       section: 1, type: 'text',   prompt: 'How many children are you applying for?', helpText: '**Explanation:** Enter the total number of children in your household who need support.\n\n**Example:** 2' },
+  { id: 'cert_method', section: 1, type: 'radio', prompt: 'How would you like to provide the certificate?', options: ['Upload Certificate', 'Enter Certificate Writer Details'], helpText: '**Explanation:** A certificate from a professional (e.g., teacher, nurse, social worker) is required. You can upload a digital copy now, or provide their contact details so we can verify.' },
+  { id: 'cert_upload', section: 1, type: 'file', prompt: 'Please upload the certificate document (PDF, JPG or PNG).', skipIf: a => a['cert_method'] !== 'Upload Certificate', helpText: '**Format expected:** A clear image or PDF document. Max size 5MB.' },
+  { id: 'cert_name', section: 1, type: 'text', prompt: 'What is the full name of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Example:** Jane Doe' },
+  { id: 'cert_role', section: 1, type: 'text', prompt: 'What is the professional role of the certificate writer in relation to the child?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Example:** School Nurse, Teacher, Social Worker' },
+  { id: 'cert_email', section: 1, type: 'text', prompt: 'What is the email address of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Format:** name@example.com' },
+  { id: 'cert_phone', section: 1, type: 'text', prompt: 'What is the phone number of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Format:** 07X XXX XX XX' },
+  { id: 'child_count', section: 1, type: 'text', prompt: 'How many children are you applying for?', helpText: '**Explanation:** Enter the total number of children in your household who need support.\n\n**Example:** 2' },
   // Per-child steps generated dynamically at runtime
-  { id: 'g1_name',           section: 1, type: 'text',   prompt: 'What is your full name?', helpText: '**Format:** Firstname Lastname' },
-  { id: 'has_g2',            section: 1, type: 'radio',  prompt: 'Is there a second guardian?', options: ['Yes', 'No'], helpText: '**Explanation:** Indicate if another parent or legal guardian shares responsibility for the child in the same household.' },
-  { id: 'g2_name',           section: 1, type: 'text',   prompt: 'What is the second guardian\'s full name?', skipIf: a => a['has_g2'] !== 'Yes' },
+  { id: 'g1_name', section: 1, type: 'text', prompt: 'What is your full name?', helpText: '**Format:** Firstname Lastname' },
+  { id: 'has_g2', section: 1, type: 'radio', prompt: 'Is there a second guardian?', options: ['Yes', 'No'], helpText: '**Explanation:** Indicate if another parent or legal guardian shares responsibility for the child in the same household.' },
+  { id: 'g2_name', section: 1, type: 'text', prompt: 'What is the second guardian\'s full name?', skipIf: a => a['has_g2'] !== 'Yes' },
 
-  { id: 'addr_street',       section: 1, type: 'text',   prompt: 'What is your home address?', helpText: '**Example:** Storgatan 1' },
-  { id: 'addr_postal',       section: 1, type: 'text',   prompt: 'What is your postal code?', helpText: '**Format:** 123 45' },
-  { id: 'addr_city',         section: 1, type: 'text',   prompt: 'What city do you live in?', helpText: '**Example:** Stockholm' },
-  { id: 'addr_apt',          section: 1, type: 'text',   prompt: 'What is your apartment number?', optional: true, helpText: '**Optional:** Usually 4 digits, e.g. 1101' },
-  { id: 'addr_co',           section: 1, type: 'text',   prompt: 'What is your C/O address?', optional: true, helpText: '**Optional:** Care Of address if your mail goes to someone else.' },
-  { id: 'contact_email',     section: 1, type: 'text',   prompt: 'What is your email address?', helpText: '**Format:** name@example.com' },
-  { id: 'contact_phone',     section: 1, type: 'text',   prompt: 'What is your phone number?', helpText: '**Format:** 07X XXX XX XX' },
-  { id: 'bank_want',         section: 1, type: 'radio',  prompt: 'Would you like to provide bank details?', options: ['Yes', 'Skip'], helpText: '**Explanation:** Providing bank details allows for faster payout if your application is approved.' },
-  { id: 'bank_name',         section: 1, type: 'text',   prompt: 'What is the name of your bank?', skipIf: a => a['bank_want'] !== 'Yes', helpText: '**Example:** Swedbank, SEB, Handelsbanken' },
-  { id: 'bank_holder',       section: 1, type: 'text',   prompt: 'What is the account holder\'s name?', skipIf: a => a['bank_want'] !== 'Yes' },
-  { id: 'bank_clearing',     section: 1, type: 'text',   prompt: 'What is the clearing number?', skipIf: a => a['bank_want'] !== 'Yes', helpText: '**Format:** 4 digits (sometimes 5 for Swedbank)' },
-  { id: 'bank_account',      section: 1, type: 'text',   prompt: 'What is the account number?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'addr_street', section: 1, type: 'text', prompt: 'What is your home address?', helpText: '**Example:** Storgatan 1' },
+  { id: 'addr_postal', section: 1, type: 'text', prompt: 'What is your postal code?', helpText: '**Format:** 123 45' },
+  { id: 'addr_city', section: 1, type: 'text', prompt: 'What city do you live in?', helpText: '**Example:** Stockholm' },
+  { id: 'addr_apt', section: 1, type: 'text', prompt: 'What is your apartment number?', optional: true, helpText: '**Optional:** Usually 4 digits, e.g. 1101' },
+  { id: 'addr_co', section: 1, type: 'text', prompt: 'What is your C/O address?', optional: true, helpText: '**Optional:** Care Of address if your mail goes to someone else.' },
+  { id: 'contact_email', section: 1, type: 'text', prompt: 'What is your email address?', helpText: '**Format:** name@example.com' },
+  { id: 'contact_phone', section: 1, type: 'text', prompt: 'What is your phone number?', helpText: '**Format:** 07X XXX XX XX' },
+  { id: 'bank_want', section: 1, type: 'radio', prompt: 'Would you like to provide bank details?', options: ['Yes', 'Skip'], helpText: '**Explanation:** Providing bank details allows for faster payout if your application is approved.' },
+  { id: 'bank_name', section: 1, type: 'text', prompt: 'What is the name of your bank?', skipIf: a => a['bank_want'] !== 'Yes', helpText: '**Example:** Swedbank, SEB, Handelsbanken' },
+  { id: 'bank_holder', section: 1, type: 'text', prompt: 'What is the account holder\'s name?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'bank_clearing', section: 1, type: 'text', prompt: 'What is the clearing number?', skipIf: a => a['bank_want'] !== 'Yes', helpText: '**Format:** 4 digits (sometimes 5 for Swedbank)' },
+  { id: 'bank_account', section: 1, type: 'text', prompt: 'What is the account number?', skipIf: a => a['bank_want'] !== 'Yes' },
 
   // ── SECTION 3: INCOME & SUPPORT ──
-  { id: 'income_sources',    section: 2, type: 'multiselect', prompt: 'Which of the following income sources does your household receive?',
-    options: ['Salary', 'Child Allowance', 'Parental Benefit', 'Study Allowance', 'Maintenance Support', 'Care Allowance', 'Unemployment Benefit', 'Housing Allowance', 'Sickness Benefit', 'Income Support', 'Other Income'], helpText: '**Explanation:** Select all that apply for all adults living in the household. This helps us calculate your total household income.' },
+  {
+    id: 'income_sources', section: 2, type: 'multiselect', prompt: 'Which of the following income sources does your household receive?',
+    options: ['Salary', 'Child Allowance', 'Parental Benefit', 'Study Allowance', 'Maintenance Support', 'Care Allowance', 'Unemployment Benefit', 'Housing Allowance', 'Sickness Benefit', 'Income Support', 'Other Income'], helpText: '**Explanation:** Select all that apply for all adults living in the household. This helps us calculate your total household income.'
+  },
   // Amount steps generated dynamically based on income_sources selection
-  { id: 'support_situation', section: 2, type: 'text',   prompt: 'Please describe your family\'s current situation.', helpText: '**Guidance:** Briefly explain why you are applying for support and any special circumstances (e.g., recent job loss, illness).' },
-  { id: 'support_type',      section: 2, type: 'select', prompt: 'What type of support are you requesting for the child?',
-    options: ['Football Shoes', 'School Equipment', 'Clothing', 'Bus Pass', 'Leisure Activity', 'Camp', 'Sports Membership', 'Other'], helpText: '**Explanation:** Choose the primary category that fits the child\'s needs.' },
-  { id: 'support_desc',      section: 2, type: 'text',   prompt: 'Please describe the support being requested.', helpText: '**Example:** A pair of winter boots and a warm jacket for the upcoming season.' },
-  { id: 'support_benefit',   section: 2, type: 'text',   prompt: 'Why would this support benefit the child?', helpText: '**Explanation:** Explain how this specific item or activity will improve the child\'s well-being or daily life.' },
-  { id: 'support_more',      section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes', 'No'], helpText: '**Explanation:** You can request support for multiple items or activities for the same child.' },
+  { id: 'support_situation', section: 2, type: 'text', prompt: 'Please describe your family\'s current situation.', helpText: '**Guidance:** Briefly explain why you are applying for support and any special circumstances (e.g., recent job loss, illness).' },
+  {
+    id: 'support_type', section: 2, type: 'select', prompt: 'What type of support are you requesting for the child?',
+    options: ['Football Shoes', 'School Equipment', 'Clothing', 'Bus Pass', 'Leisure Activity', 'Camp', 'Sports Membership', 'Other'], helpText: '**Explanation:** Choose the primary category that fits the child\'s needs.'
+  },
+  { id: 'support_desc', section: 2, type: 'text', prompt: 'Please describe the support being requested.', helpText: '**Example:** A pair of winter boots and a warm jacket for the upcoming season.' },
+  { id: 'support_benefit', section: 2, type: 'text', prompt: 'Why would this support benefit the child?', helpText: '**Explanation:** Explain how this specific item or activity will improve the child\'s well-being or daily life.' },
+  { id: 'support_more', section: 2, type: 'radio', prompt: 'Would you like to add another support request?', options: ['Yes', 'No'], helpText: '**Explanation:** You can request support for multiple items or activities for the same child.' },
 
   // ── SECTION 4: DOCUMENTS & REVIEW ──
-  { id: 'docs_upload',       section: 3, type: 'radio',  prompt: 'Would you like to upload any additional supporting documents?', options: ['Upload Document', 'Skip'], helpText: '**Explanation:** You can provide proof of income or other relevant documents to strengthen your application.' },
-  { id: 'docs_file',         section: 3, type: 'file',   prompt: 'Please upload the supporting document.', skipIf: a => a['docs_upload'] !== 'Upload Document', helpText: '**Format expected:** PDF, JPG, or PNG files up to 5MB.' },
-  { id: 'review_info',       section: 3, type: 'info',   prompt: 'Please review the information collected. Your responses have been saved and are ready for submission.', helpText: '**Guidance:** Click Continue to proceed to the final consent questions.' },
-  { id: 'consent_data',      section: 3, type: 'radio',  prompt: 'Do you agree that Majblomman may process your personal data?', options: ['Yes', 'No'], helpText: '**Explanation:** We need your consent to securely store and review your application under GDPR.' },
-  { id: 'consent_accurate',  section: 3, type: 'radio',  prompt: 'Do you confirm that the information provided is accurate and supported by relevant documentation?', options: ['Yes', 'No'], helpText: '**Explanation:** Giving false information may lead to rejection.' },
+  { id: 'docs_upload', section: 3, type: 'radio', prompt: 'Would you like to upload any additional supporting documents?', options: ['Upload Document', 'Skip'], helpText: '**Explanation:** You can provide proof of income or other relevant documents to strengthen your application.' },
+  { id: 'docs_file', section: 3, type: 'file', prompt: 'Please upload the supporting document.', skipIf: a => a['docs_upload'] !== 'Upload Document', helpText: '**Format expected:** PDF, JPG, or PNG files up to 5MB.' },
+  { id: 'review_info', section: 3, type: 'info', prompt: 'Please review the information collected. Your responses have been saved and are ready for submission.', helpText: '**Guidance:** Click Continue to proceed to the final consent questions.' },
+  { id: 'consent_data', section: 3, type: 'radio', prompt: 'Do you agree that Majblomman may process your personal data?', options: ['Yes', 'No'], helpText: '**Explanation:** We need your consent to securely store and review your application under GDPR.' },
+  { id: 'consent_accurate', section: 3, type: 'radio', prompt: 'Do you confirm that the information provided is accurate and supported by relevant documentation?', options: ['Yes', 'No'], helpText: '**Explanation:** Giving false information may lead to rejection.' },
 ];
 
 // ─────────────────────────────────────────────
@@ -163,66 +167,66 @@ function isHelpQuestion(q: string): boolean {
 // ─────────────────────────────────────────────
 const SendIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
   </svg>
 );
 const AttachIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-    <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+    <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
   </svg>
 );
 const MicIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" /><path d="M19 10v2a7 7 0 01-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
   </svg>
 );
 const ChevronRight = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 opacity-50">
-    <polyline points="9 18 15 12 9 6"/>
+    <polyline points="9 18 15 12 9 6" />
   </svg>
 );
 const LockIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
   </svg>
 );
 const ShieldIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#5b5ef4]">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
   </svg>
 );
 const CheckIcon = () => (
   <svg viewBox="0 0 12 12" fill="none" className="w-3 h-3">
-    <polyline points="2,6 5,9 10,3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <polyline points="2,6 5,9 10,3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 const TrophyIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-yellow-500">
-    <path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/>
-    <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-    <path d="M18 2H6v7a6 6 0 0012 0V2z"/>
+    <path d="M6 9H4.5a2.5 2.5 0 010-5H6" /><path d="M18 9h1.5a2.5 2.5 0 000-5H18" />
+    <path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+    <path d="M18 2H6v7a6 6 0 0012 0V2z" />
   </svg>
 );
 
 const BotAvatar = () => (
   <div className="w-16 h-16 mx-auto mb-3 flex items-center justify-center">
     <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-      <circle cx="32" cy="32" r="30" fill="#EEF0FF"/>
-      <rect x="18" y="28" width="28" height="20" rx="5" fill="#5b5ef4"/>
-      <rect x="20" y="14" width="24" height="20" rx="6" fill="#7c7ef7"/>
-      <line x1="32" y1="14" x2="32" y2="8" stroke="#7c7ef7" strokeWidth="2" strokeLinecap="round"/>
-      <circle cx="32" cy="6" r="2.5" fill="#f5c842"/>
-      <circle cx="26" cy="23" r="3" fill="white"/>
-      <circle cx="38" cy="23" r="3" fill="white"/>
-      <circle cx="26.8" cy="23.8" r="1.5" fill="#1e1b8e"/>
-      <circle cx="38.8" cy="23.8" r="1.5" fill="#1e1b8e"/>
-      <path d="M26 30 Q32 34 38 30" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-      <rect x="10" y="31" width="8" height="5" rx="2.5" fill="#5b5ef4"/>
-      <rect x="46" y="31" width="8" height="5" rx="2.5" fill="#5b5ef4"/>
-      <circle cx="27" cy="38" r="2" fill="#a5b4fc"/>
-      <circle cx="32" cy="38" r="2" fill="#a5b4fc"/>
-      <circle cx="37" cy="38" r="2" fill="#a5b4fc"/>
+      <circle cx="32" cy="32" r="30" fill="#EEF0FF" />
+      <rect x="18" y="28" width="28" height="20" rx="5" fill="#5b5ef4" />
+      <rect x="20" y="14" width="24" height="20" rx="6" fill="#7c7ef7" />
+      <line x1="32" y1="14" x2="32" y2="8" stroke="#7c7ef7" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="32" cy="6" r="2.5" fill="#f5c842" />
+      <circle cx="26" cy="23" r="3" fill="white" />
+      <circle cx="38" cy="23" r="3" fill="white" />
+      <circle cx="26.8" cy="23.8" r="1.5" fill="#1e1b8e" />
+      <circle cx="38.8" cy="23.8" r="1.5" fill="#1e1b8e" />
+      <path d="M26 30 Q32 34 38 30" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      <rect x="10" y="31" width="8" height="5" rx="2.5" fill="#5b5ef4" />
+      <rect x="46" y="31" width="8" height="5" rx="2.5" fill="#5b5ef4" />
+      <circle cx="27" cy="38" r="2" fill="#a5b4fc" />
+      <circle cx="32" cy="38" r="2" fill="#a5b4fc" />
+      <circle cx="37" cy="38" r="2" fill="#a5b4fc" />
     </svg>
   </div>
 );
@@ -230,12 +234,12 @@ const BotAvatar = () => (
 const BotBubbleIcon = () => (
   <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center flex-shrink-0 shadow-sm">
     <svg width="18" height="18" viewBox="0 0 64 64" fill="none">
-      <rect x="18" y="28" width="28" height="20" rx="5" fill="white" opacity="0.8"/>
-      <rect x="20" y="14" width="24" height="20" rx="6" fill="white"/>
-      <circle cx="26" cy="23" r="2.5" fill="#f5c842"/>
-      <circle cx="38" cy="23" r="2.5" fill="#f5c842"/>
-      <circle cx="26.8" cy="23.8" r="1" fill="#1e1b8e"/>
-      <circle cx="38.8" cy="23.8" r="1" fill="#1e1b8e"/>
+      <rect x="18" y="28" width="28" height="20" rx="5" fill="white" opacity="0.8" />
+      <rect x="20" y="14" width="24" height="20" rx="6" fill="white" />
+      <circle cx="26" cy="23" r="2.5" fill="#f5c842" />
+      <circle cx="38" cy="23" r="2.5" fill="#f5c842" />
+      <circle cx="26.8" cy="23.8" r="1" fill="#1e1b8e" />
+      <circle cx="38.8" cy="23.8" r="1" fill="#1e1b8e" />
     </svg>
   </div>
 );
@@ -243,17 +247,17 @@ const BotBubbleIcon = () => (
 const UserAvatar = () => (
   <div className="w-8 h-8 rounded-full bg-[#f5c842] flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="4" fill="#a0522d"/>
-      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="#c68642"/>
+      <circle cx="12" cy="8" r="4" fill="#a0522d" />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="#c68642" />
     </svg>
   </div>
 );
 
 const TypingDots = () => (
   <div className="flex items-center gap-1 py-1">
-    {[0,1,2].map(i => (
+    {[0, 1, 2].map(i => (
       <motion.div key={i} className="w-2 h-2 rounded-full bg-[#5b5ef4]"
-        animate={{ y: [0,-4,0] }} transition={{ duration:0.6, repeat:Infinity, delay: i*0.15 }}/>
+        animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }} />
     ))}
   </div>
 );
@@ -265,48 +269,48 @@ type Msg = { id: string; from: 'ai' | 'user'; text: string; time: string; option
 
 export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlowProps) {
   const sections = language === 'en' ? SECTIONS_EN : SECTIONS_SV;
-  const quickQs  = language === 'en' ? QUICK_QUESTIONS_EN : QUICK_QUESTIONS_SV;
+  const quickQs = language === 'en' ? QUICK_QUESTIONS_EN : QUICK_QUESTIONS_SV;
 
   const uid = () => Math.random().toString(36).slice(2);
-  const ts  = () => new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  const ts = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   // Answers store
-  const [answers, setAnswers]         = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, any>>({});
   // Flat ordered list of active steps (BASE_STEPS expanded with dynamic per-child + per-income steps)
-  const [steps, setSteps]             = useState<Step[]>([...BASE_STEPS]);
+  const [steps, setSteps] = useState<Step[]>([...BASE_STEPS]);
   // Index into `steps` of the NEXT step to present
-  const [stepIdx, setStepIdx]         = useState(0);
+  const [stepIdx, setStepIdx] = useState(0);
   // Which section index is active (for left sidebar)
   const [activeSection, setActiveSection] = useState(0);
   // Which sections are completed
-  const [completed, setCompleted]     = useState<boolean[]>(Array(4).fill(false));
+  const [completed, setCompleted] = useState<boolean[]>(Array(4).fill(false));
 
   // Conversation state
-  const [conv, setConv]               = useState<Msg[]>([{
+  const [conv, setConv] = useState<Msg[]>([{
     id: uid(), from: 'ai', time: ts(),
     text: "Hello! Welcome to Majblomman's Application Assistant.\n\nI'm here to help you apply for financial support for your family. The process usually takes about 10 minutes to complete, and I'll guide you through each step.",
   }]);
-  const [typing, setTyping]           = useState(false);
-  const [inputVal, setInputVal]       = useState('');
-  const [selectVal, setSelectVal]     = useState('');
-  const [multiSel, setMultiSel]       = useState<string[]>([]);
+  const [typing, setTyping] = useState(false);
+  const [inputVal, setInputVal] = useState('');
+  const [selectVal, setSelectVal] = useState('');
+  const [multiSel, setMultiSel] = useState<string[]>([]);
   const [expandedHelpMsgId, setExpandedHelpMsgId] = useState<string | null>(null);
 
   // Support request loop tracking
   const [supportRound, setSupportRound] = useState(1);
   // Per-child loop tracking
-  const [childTotal, setChildTotal]   = useState(0);
-  const [childRound, setChildRound]   = useState(1);
+  const [childTotal, setChildTotal] = useState(0);
+  const [childRound, setChildRound] = useState(1);
 
-  const convEndRef  = useRef<HTMLDivElement>(null);
-  const helpEndRef  = useRef<HTMLDivElement>(null);
-  const fileRef     = useRef<HTMLInputElement>(null);
+  const convEndRef = useRef<HTMLDivElement>(null);
+  const helpEndRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const docsFileRef = useRef<HTMLInputElement>(null);
 
   // ── Voice mode state ──
-  const [voiceMode, setVoiceMode]     = useState(false);
+  const [voiceMode, setVoiceMode] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking]   = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   // Text-to-speech: speak a string if voice mode is active
@@ -318,7 +322,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     utter.rate = 0.95;
     utter.pitch = 1;
     utter.onstart = () => setIsSpeaking(true);
-    utter.onend   = () => setIsSpeaking(false);
+    utter.onend = () => setIsSpeaking(false);
     utter.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.speak(utter);
   }, [voiceMode]);
@@ -328,7 +332,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     if (!voiceMode) return;
     const last = conv[conv.length - 1];
     if (last?.from === 'ai') speak(last.text);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conv, voiceMode]);
 
   // Stop speech when voice mode turns off
@@ -338,7 +342,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       setIsSpeaking(false);
       stopListening();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [voiceMode]);
 
   // Start speech recognition
@@ -350,9 +354,9 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
-    recognition.onstart  = () => setIsListening(true);
-    recognition.onend    = () => setIsListening(false);
-    recognition.onerror  = () => setIsListening(false);
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
     recognition.onresult = (e: any) => {
       const transcript = e.results[0][0].transcript;
       setInputVal(transcript);
@@ -367,7 +371,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     setIsListening(false);
   }, []);
 
-  useEffect(() => { convEndRef.current?.scrollIntoView({ behavior:'smooth' }); }, [conv, typing]);
+  useEffect(() => { convEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [conv, typing]);
 
   // Each mount of ChatFlow gets its own session key so a reset (key change)
   // always starts from a completely blank slate — never inheriting old progress.
@@ -400,15 +404,15 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       if (step.id === 'child_count') {
         for (let ci = 1; ci <= count; ci++) {
           result.push({ id: `child_${ci}_name`, section: 1, type: 'text', prompt: `What is child ${ci}'s full name?`, helpText: '**Format:** Firstname Lastname' });
-          result.push({ id: `child_${ci}_idtype`, section: 1, type: 'radio', prompt: `Which identification type does child ${ci} have?`, options: ['Personal Identity Number','Coordination Number','LMA Number','Other'], helpText: '**Explanation:** Choose the formal ID type used for the child in Sweden.' });
-          result.push({ id: `child_${ci}_idnum`, section: 1, type: 'text',  prompt: `Please enter the identification number for child ${ci}.`, helpText: '**Format expected:** 10 or 12 digits, e.g., 20100101-1234' });
+          result.push({ id: `child_${ci}_idtype`, section: 1, type: 'radio', prompt: `Which identification type does child ${ci} have?`, options: ['Personal Identity Number', 'Coordination Number', 'LMA Number', 'Other'], helpText: '**Explanation:** Choose the formal ID type used for the child in Sweden.' });
+          result.push({ id: `child_${ci}_idnum`, section: 1, type: 'text', prompt: `Please enter the identification number for child ${ci}.`, helpText: '**Format expected:** 10 or 12 digits, e.g., 20100101-1234' });
         }
       }
 
       // After income_sources, insert amount questions for each selected source
       if (step.id === 'income_sources' && incSources.length > 0) {
         for (const src of incSources) {
-          result.push({ id: `income_amt_${src.replace(/\s+/g,'_').toLowerCase()}`, section: 2, type: 'text', prompt: `Please enter the monthly amount received for "${src}" (SEK).`, helpText: '**Format:** Numeric amount only, e.g., 5000' });
+          result.push({ id: `income_amt_${src.replace(/\s+/g, '_').toLowerCase()}`, section: 2, type: 'text', prompt: `Please enter the monthly amount received for "${src}" (SEK).`, helpText: '**Format:** Numeric amount only, e.g., 5000' });
         }
       }
 
@@ -423,7 +427,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     setSteps(s);
     // Ask first real step
     setTimeout(() => askStep(s, 0, {}), 600);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Ask a step ──
@@ -454,41 +458,10 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
         helpText: step.helpText || "**Guidance:** Please answer the question to the best of your ability.",
       }]);
     }, 750);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
-
-  // ── Go Back ──
-  const goBack = useCallback(() => {
-    if (stepIdx <= 0 || conv.length < 2) return;
-    
-    let prevIdx = stepIdx - 1;
-    while (prevIdx >= 0) {
-      const step = steps[prevIdx];
-      if (!step.skipIf || !step.skipIf(answers)) {
-        break;
-      }
-      prevIdx--;
-    }
-    
-    if (prevIdx < 0) return;
-
-    setConv(prev => {
-      let lastUserIdx = -1;
-      for (let i = prev.length - 1; i >= 0; i--) {
-        if (prev[i].from === 'user') {
-          lastUserIdx = i;
-          break;
-        }
-      }
-      if (lastUserIdx === -1) return prev;
-      return prev.slice(0, lastUserIdx);
-    });
-
-    setStepIdx(prevIdx);
-    setActiveSection(steps[prevIdx].section);
-  }, [stepIdx, steps, answers, conv]);
 
   // ── Submit answer ──
   const submitAnswer = useCallback((value: string | string[], overrideSteps?: Step[]) => {
@@ -501,7 +474,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     // Intercept help questions
     if (typeof value === 'string' && isHelpQuestion(value)) {
       setConv(prev => [
-        ...prev, 
+        ...prev,
         { id: uid(), from: 'user', time: ts(), text: value },
         { id: uid(), from: 'ai', time: ts(), text: getHelpAnswer(value) }
       ]);
@@ -542,10 +515,10 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       const nextRound = supportRound + 1;
       setSupportRound(nextRound);
       const extraSteps: Step[] = [
-        { id: `support_type_${nextRound}`,    section: 2, type: 'select', prompt: `What type of support are you requesting? (Request ${nextRound})`, options: ['Football Shoes','School Equipment','Clothing','Bus Pass','Leisure Activity','Camp','Sports Membership','Other'], helpText: '**Explanation:** Choose the primary category that fits the additional request.' },
-        { id: `support_desc_${nextRound}`,    section: 2, type: 'text',   prompt: `Please describe the support being requested. (Request ${nextRound})`, helpText: '**Example:** Registration fee for the local soccer club.' },
-        { id: `support_benefit_${nextRound}`, section: 2, type: 'text',   prompt: `Why would this support benefit the child? (Request ${nextRound})`, helpText: '**Explanation:** Explain how it will improve their well-being.' },
-        { id: `support_more_${nextRound}`,    section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes','No'], helpText: '**Explanation:** You can keep adding as many requests as needed.' },
+        { id: `support_type_${nextRound}`, section: 2, type: 'select', prompt: `What type of support are you requesting? (Request ${nextRound})`, options: ['Football Shoes', 'School Equipment', 'Clothing', 'Bus Pass', 'Leisure Activity', 'Camp', 'Sports Membership', 'Other'], helpText: '**Explanation:** Choose the primary category that fits the additional request.' },
+        { id: `support_desc_${nextRound}`, section: 2, type: 'text', prompt: `Please describe the support being requested. (Request ${nextRound})`, helpText: '**Example:** Registration fee for the local soccer club.' },
+        { id: `support_benefit_${nextRound}`, section: 2, type: 'text', prompt: `Why would this support benefit the child? (Request ${nextRound})`, helpText: '**Explanation:** Explain how it will improve their well-being.' },
+        { id: `support_more_${nextRound}`, section: 2, type: 'radio', prompt: 'Would you like to add another support request?', options: ['Yes', 'No'], helpText: '**Explanation:** You can keep adding as many requests as needed.' },
       ];
       const insertAt = stepIdx + 1;
       const spliced = [...newSteps.slice(0, insertAt), ...extraSteps, ...newSteps.slice(insertAt)];
@@ -560,10 +533,10 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
     const currentSection = step.section;
     const nextStep = newSteps[nextIdx];
     if (nextStep && nextStep.section !== currentSection) {
-      setCompleted(prev => { const n=[...prev]; n[currentSection]=true; return n; });
+      setCompleted(prev => { const n = [...prev]; n[currentSection] = true; return n; });
     } else if (!nextStep) {
       // Finished all steps – mark final section
-      setCompleted(prev => { const n=[...prev]; n[currentSection]=true; return n; });
+      setCompleted(prev => { const n = [...prev]; n[currentSection] = true; return n; });
     }
 
     setStepIdx(nextIdx);
@@ -578,7 +551,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
         }]);
       }, 1200);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [steps, stepIdx, answers, expandSteps, supportRound]);
 
   // Current active step for input rendering
@@ -592,7 +565,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
   // RENDER
   // ─────────────────────────────────────────────
   return (
-    <div style={{ fontFamily:"'Plus Jakarta Sans', system-ui, sans-serif" }} className="w-full">
+    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }} className="w-full">
       <div className="w-full max-w-[1400px] mx-auto px-6 pt-5 pb-4 grid grid-cols-[280px_1fr] gap-6 h-[calc(100vh-140px)] min-h-[600px]">
 
         {/* ══ LEFT: Application Progress ══ */}
@@ -604,23 +577,21 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
             <ul className="space-y-1">
               {sections.map((name, idx) => {
                 const isActive = idx === activeSection;
-                const isDone   = completed[idx];
-                const canNav   = isDone || idx <= activeSection;
+                const isDone = completed[idx];
+                const canNav = isDone || idx <= activeSection;
                 return (
                   <li key={idx}>
                     <button
                       onClick={() => canNav ? setActiveSection(idx) : undefined}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-                        isActive ? 'bg-[#5b5ef4] text-white shadow-md shadow-[#5b5ef4]/25'
-                        : canNav  ? 'hover:bg-[#f0f0ff] text-[#3a3a5c] cursor-pointer'
-                        : 'text-[#b0b0c8] cursor-default'
-                      }`}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${isActive ? 'bg-[#5b5ef4] text-white shadow-md shadow-[#5b5ef4]/25'
+                          : canNav ? 'hover:bg-[#f0f0ff] text-[#3a3a5c] cursor-pointer'
+                            : 'text-[#b0b0c8] cursor-default'
+                        }`}
                     >
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all ${
-                        isActive ? 'bg-white text-[#5b5ef4]'
-                        : isDone  ? 'bg-[#22c55e] text-white'
-                        : 'border-2 border-[#d0d0e8] text-[#9090b0]'
-                      }`}>
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all ${isActive ? 'bg-white text-[#5b5ef4]'
+                          : isDone ? 'bg-[#22c55e] text-white'
+                            : 'border-2 border-[#d0d0e8] text-[#9090b0]'
+                        }`}>
                         {isDone && !isActive ? <CheckIcon /> : idx + 1}
                       </span>
                       <span className={`text-[13px] font-medium flex-1 leading-tight`}>{name}</span>
@@ -640,10 +611,10 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
               <p className="text-xs text-[#6b7280]">{progressPct === 0 ? "Let's get started!" : progressPct < 100 ? 'Keep going!' : 'All done! 🎉'}</p>
             </div>
           </div>
-          
+
           {/* Save & Continue Later Button */}
           <div className="p-3 border-t border-[#f0f0f8] mt-auto">
-            <button 
+            <button
               onClick={() => alert("Your progress has been safely saved! You can close this window and return later to finish your application.")}
               className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-[#e8e8f4] bg-[#fafafe] hover:border-[#5b5ef4] hover:text-[#5b5ef4] hover:bg-[#f0f0ff] transition-all text-[13px] text-[#3a3a5c] font-semibold shadow-sm"
             >
@@ -664,7 +635,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 <div
                   className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[12px] font-semibold text-[#5b5ef4]"
                 >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                   Text
                 </div>
               </div>
@@ -677,28 +648,26 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
             <AnimatePresence initial={false}>
               {conv.map((msg) => (
                 <motion.div key={msg.id}
-                  initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.25 }}
-                  className={`flex items-end gap-2 ${msg.from==='user'?'flex-row-reverse':''}`}
+                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}
+                  className={`flex items-end gap-2 ${msg.from === 'user' ? 'flex-row-reverse' : ''}`}
                 >
-                  {msg.from==='ai' ? <BotBubbleIcon /> : <UserAvatar />}
-                  <div className={`max-w-[75%] flex flex-col ${msg.from==='user'?'items-end':'items-start'}`}>
-                    <div className={`px-4 py-3 rounded-2xl text-[13.5px] leading-relaxed whitespace-pre-line shadow-sm relative ${
-                      msg.from==='ai'
+                  {msg.from === 'ai' ? <BotBubbleIcon /> : <UserAvatar />}
+                  <div className={`max-w-[75%] flex flex-col ${msg.from === 'user' ? 'items-end' : 'items-start'}`}>
+                    <div className={`px-4 py-3 rounded-2xl text-[13.5px] leading-relaxed whitespace-pre-line shadow-sm relative ${msg.from === 'ai'
                         ? 'bg-[#f7f7ff] text-[#1a1a2e] rounded-bl-sm border border-[#ededff] pr-10'
                         : 'bg-[#5b5ef4] text-white rounded-br-sm'
-                    }`}>
+                      }`}>
                       {msg.text}
-                      
+
                       {/* Info Icon for Explanation Toggle */}
-                      {msg.from==='ai' && msg.helpText && (
+                      {msg.from === 'ai' && msg.helpText && (
                         <button
                           onClick={() => setExpandedHelpMsgId(expandedHelpMsgId === msg.id ? null : msg.id)}
-                          className={`absolute right-3 top-3 transition-colors bg-white rounded-full p-0.5 shadow-sm border ${
-                            expandedHelpMsgId === msg.id ? 'border-[#5b5ef4] text-[#5b5ef4]' : 'border-[#e8e8f4] text-[#b0b0c8] hover:text-[#5b5ef4]'
-                          }`}
+                          className={`absolute right-3 top-3 transition-colors bg-white rounded-full p-0.5 shadow-sm border ${expandedHelpMsgId === msg.id ? 'border-[#5b5ef4] text-[#5b5ef4]' : 'border-[#e8e8f4] text-[#b0b0c8] hover:text-[#5b5ef4]'
+                            }`}
                           title="Click to view explanation, format, and examples"
                         >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                         </button>
                       )}
 
@@ -714,10 +683,10 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                             <div className="bg-white border border-[#e8e8f4] rounded-xl p-3 text-[12.5px] text-[#3a3a5c]">
                               <div className="font-semibold text-[#1a1a2e] mb-1.5 flex justify-between items-center">
                                 <span className="flex items-center gap-1.5">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3.5 h-3.5 text-[#5b5ef4]"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3.5 h-3.5 text-[#5b5ef4]"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
                                   Guidance
                                 </span>
-                                <button onClick={() => setExpandedHelpMsgId(null)} className="text-[#b0b0c8] hover:text-[#1a1a2e] transition-colors"><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                                <button onClick={() => setExpandedHelpMsgId(null)} className="text-[#b0b0c8] hover:text-[#1a1a2e] transition-colors"><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
                               </div>
                               <div className="whitespace-pre-wrap leading-relaxed space-y-1">
                                 {msg.helpText.split('\n\n').map((block, i) => {
@@ -744,7 +713,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                       </AnimatePresence>
 
                       {/* Inline radio buttons */}
-                      {msg.from==='ai' && msg.type==='radio' && msg.options && msg.stepId===activeStepId && (
+                      {msg.from === 'ai' && msg.type === 'radio' && msg.options && msg.stepId === activeStepId && (
                         <div className="flex flex-wrap gap-2 mt-3">
                           {msg.options.map(opt => (
                             <button key={opt} onClick={() => submitAnswer(opt)}
@@ -756,7 +725,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                       )}
 
                       {/* Info step – just show Continue button */}
-                      {msg.from==='ai' && msg.type==='info' && msg.stepId===activeStepId && (
+                      {msg.from === 'ai' && msg.type === 'info' && msg.stepId === activeStepId && (
                         <div className="mt-3">
                           <button onClick={() => submitAnswer('acknowledged')}
                             className="px-4 py-2 rounded-lg bg-[#5b5ef4] text-white text-[13px] font-medium hover:bg-[#4a4de0] transition-colors">
@@ -774,7 +743,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
             {/* Typing indicator */}
             <AnimatePresence>
               {typing && (
-                <motion.div key="typing" initial={{opacity:0,y:6}} animate={{opacity:1,y:0}} exit={{opacity:0}} className="flex items-end gap-2">
+                <motion.div key="typing" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-end gap-2">
                   <BotBubbleIcon />
                   <div className="bg-[#f7f7ff] border border-[#ededff] rounded-2xl rounded-bl-sm px-4 py-3">
                     <TypingDots />
@@ -782,7 +751,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 </motion.div>
               )}
             </AnimatePresence>
-            <div ref={convEndRef}/>
+            <div ref={convEndRef} />
           </div>
 
           {/* Input area */}
@@ -795,12 +764,11 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                     const sel = multiSel.includes(opt);
                     return (
                       <button key={opt}
-                        onClick={() => setMultiSel(prev => sel ? prev.filter(x=>x!==opt) : [...prev, opt])}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-[12.5px] text-left font-medium transition-all ${
-                          sel ? 'bg-[#5b5ef4] text-white border-[#5b5ef4]' : 'bg-[#fafafe] text-[#3a3a5c] border-[#e0e0f0] hover:border-[#5b5ef4]'
-                        }`}>
+                        onClick={() => setMultiSel(prev => sel ? prev.filter(x => x !== opt) : [...prev, opt])}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-[12.5px] text-left font-medium transition-all ${sel ? 'bg-[#5b5ef4] text-white border-[#5b5ef4]' : 'bg-[#fafafe] text-[#3a3a5c] border-[#e0e0f0] hover:border-[#5b5ef4]'
+                          }`}>
                         <span className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${sel ? 'bg-white border-white' : 'border-[#c0c0d8]'}`}>
-                          {sel && <svg viewBox="0 0 10 10" className="w-2.5 h-2.5"><polyline points="1,5 4,8 9,2" stroke="#5b5ef4" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>}
+                          {sel && <svg viewBox="0 0 10 10" className="w-2.5 h-2.5"><polyline points="1,5 4,8 9,2" stroke="#5b5ef4" strokeWidth="1.5" fill="none" strokeLinecap="round" /></svg>}
                         </span>
                         {opt}
                       </button>
@@ -825,7 +793,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 </select>
                 <button disabled={!selectVal} onClick={() => submitAnswer(selectVal)}
                   className="w-10 h-10 rounded-xl bg-[#5b5ef4] text-white flex items-center justify-center disabled:opacity-40 hover:bg-[#4a4de0] transition-colors shadow-md shadow-[#5b5ef4]/25">
-                  <SendIcon/>
+                  <SendIcon />
                 </button>
               </div>
             )}
@@ -834,7 +802,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
             {activeStep?.type === 'file' && (
               <>
                 <input type="file" ref={fileRef} accept=".pdf,.jpg,.jpeg,.png" className="hidden"
-                  onChange={e => { if(e.target.files?.[0]) { submitAnswer(e.target.files[0].name); e.target.value=''; } }}/>
+                  onChange={e => { if (e.target.files?.[0]) { submitAnswer(e.target.files[0].name); e.target.value = ''; } }} />
                 <button onClick={() => fileRef.current?.click()}
                   className="w-full border-2 border-dashed border-[#c0c0e8] rounded-xl px-4 py-3.5 text-[13px] text-[#7070a0] hover:border-[#5b5ef4] hover:text-[#5b5ef4] transition-colors text-center font-medium">
                   📎 Click to upload file (PDF, JPG, PNG)
@@ -866,15 +834,15 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 {voiceMode && isSpeaking && !isListening && (
                   <div className="flex items-center gap-2 px-3 py-2 bg-violet-50 border border-violet-100 rounded-xl">
                     <span className="flex gap-0.5 items-end h-4">
-                      {[0,1,2].map(i => (
-                        <span key={i} className="w-1 bg-[#5b5ef4] rounded-full animate-bounce" style={{ height:`${8+i*4}px`, animationDelay:`${i*0.15}s` }}/>
+                      {[0, 1, 2].map(i => (
+                        <span key={i} className="w-1 bg-[#5b5ef4] rounded-full animate-bounce" style={{ height: `${8 + i * 4}px`, animationDelay: `${i * 0.15}s` }} />
                       ))}
                     </span>
                     <span className="text-[12px] text-[#5b5ef4] font-medium">Reading question aloud…</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2 bg-[#f7f7ff] border border-[#e8e8f4] rounded-xl px-3 py-2">
-                  <button className="text-[#9090b0] hover:text-[#5b5ef4] transition-colors p-1"><AttachIcon/></button>
+                  <button className="text-[#9090b0] hover:text-[#5b5ef4] transition-colors p-1"><AttachIcon /></button>
                   <input className="flex-1 bg-transparent text-[13.5px] text-[#1a1a2e] placeholder-[#b0b0c8] focus:outline-none"
                     placeholder={voiceMode ? (isListening ? 'Listening…' : 'Voice answer will appear here — edit if needed') : (activeStep.optional ? 'Type your answer… (or leave blank to skip)' : 'Type your answer…')}
                     value={inputVal}
@@ -884,25 +852,24 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                         if (inputVal.trim()) submitAnswer(inputVal.trim());
                         else if (activeStep.optional) submitAnswer('');
                       }
-                    }}/>
-                    
+                    }} />
+
                   {/* Mic button — active in all modes but especially useful in voice mode */}
                   <button
                     onClick={() => isListening ? stopListening() : startListening()}
                     title={isListening ? 'Stop recording' : 'Start voice input'}
-                    className={`p-1 rounded-lg transition-all ${
-                      isListening
+                    className={`p-1 rounded-lg transition-all ${isListening
                         ? 'text-red-500 bg-red-50 animate-pulse'
                         : 'text-[#9090b0] hover:text-[#5b5ef4] hover:bg-[#f0f0ff]'
-                    }`}
+                      }`}
                   >
-                    <MicIcon/>
+                    <MicIcon />
                   </button>
                   <button
                     disabled={!inputVal.trim() && !activeStep.optional}
                     onClick={() => { if (inputVal.trim()) submitAnswer(inputVal.trim()); else if (activeStep.optional) submitAnswer(''); }}
                     className="w-8 h-8 rounded-lg bg-[#5b5ef4] text-white flex items-center justify-center disabled:opacity-40 hover:bg-[#4a4de0] transition-colors shadow-sm">
-                    <SendIcon/>
+                    <SendIcon />
                   </button>
                 </div>
               </div>
@@ -915,26 +882,11 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 ✓ Submit Application
               </button>
             )}
-
-            {/* Go Back Button */}
-            {stepIdx > 0 && (
-              <div className="flex justify-center pt-2">
-                <button 
-                  onClick={goBack}
-                  className="text-xs text-[#9090b0] hover:text-[#5b5ef4] transition-colors flex items-center gap-1"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-                    <polyline points="15 18 9 12 15 6" />
-                  </svg>
-                  Go back to previous step
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Security note */}
           <div className="flex items-center justify-center gap-1.5 py-2 text-[11px] text-[#b0b0c8] border-t border-[#f0f0f8]">
-            <LockIcon/> Your information is saved securely and encrypted.
+            <LockIcon /> Your information is saved securely and encrypted.
           </div>
         </section>
       </div>
