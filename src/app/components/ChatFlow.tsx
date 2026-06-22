@@ -52,6 +52,7 @@ interface Step {
   section: number;         // 0-indexed section
   type: QType;
   prompt: string;
+  helpText?: string;
   options?: string[];
   optional?: boolean;
   skipIf?: (ans: Record<string, any>) => boolean;   // if true, skip this step
@@ -62,52 +63,51 @@ interface Step {
 // All steps in order. Dynamic (per-child) steps are generated at runtime.
 const BASE_STEPS: Step[] = [
   // ── SECTION 1: ELIGIBILITY & HISTORY ──
-
-  { id: 'prev_received',     section: 0, type: 'radio',  prompt: 'Have any of the children received financial support from Majblomman during the last 12 months?', options: ['Yes', 'No'] },
+  { id: 'prev_received',     section: 0, type: 'radio',  prompt: 'Have any of the children received financial support from Majblomman during the last 12 months?', options: ['Yes', 'No'], helpText: '**Explanation:** We need to know if you have recently received support to prioritize new applicants.\n\n**Guidance:** Answer Yes if you received any financial aid from us since exactly one year ago today.' },
 
   // ── SECTION 2: APPLICATION DETAILS ──
-  { id: 'cert_method',       section: 1, type: 'radio',  prompt: 'How would you like to provide the certificate?', options: ['Upload Certificate', 'Enter Certificate Writer Details'] },
-  { id: 'cert_upload',       section: 1, type: 'file',   prompt: 'Please upload the certificate document (PDF, JPG or PNG).', skipIf: a => a['cert_method'] !== 'Upload Certificate' },
-  { id: 'cert_name',         section: 1, type: 'text',   prompt: 'What is the full name of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_role',         section: 1, type: 'text',   prompt: 'What is the professional role of the certificate writer in relation to the child?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_email',        section: 1, type: 'text',   prompt: 'What is the email address of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'cert_phone',        section: 1, type: 'text',   prompt: 'What is the phone number of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate' },
-  { id: 'child_count',       section: 1, type: 'text',   prompt: 'How many children are you applying for?' },
+  { id: 'cert_method',       section: 1, type: 'radio',  prompt: 'How would you like to provide the certificate?', options: ['Upload Certificate', 'Enter Certificate Writer Details'], helpText: '**Explanation:** A certificate from a professional (e.g., teacher, nurse, social worker) is required. You can upload a digital copy now, or provide their contact details so we can verify.' },
+  { id: 'cert_upload',       section: 1, type: 'file',   prompt: 'Please upload the certificate document (PDF, JPG or PNG).', skipIf: a => a['cert_method'] !== 'Upload Certificate', helpText: '**Format expected:** A clear image or PDF document. Max size 5MB.' },
+  { id: 'cert_name',         section: 1, type: 'text',   prompt: 'What is the full name of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Example:** Jane Doe' },
+  { id: 'cert_role',         section: 1, type: 'text',   prompt: 'What is the professional role of the certificate writer in relation to the child?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Example:** School Nurse, Teacher, Social Worker' },
+  { id: 'cert_email',        section: 1, type: 'text',   prompt: 'What is the email address of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Format:** name@example.com' },
+  { id: 'cert_phone',        section: 1, type: 'text',   prompt: 'What is the phone number of the certificate writer?', skipIf: a => a['cert_method'] === 'Upload Certificate', helpText: '**Format:** 07X XXX XX XX' },
+  { id: 'child_count',       section: 1, type: 'text',   prompt: 'How many children are you applying for?', helpText: '**Explanation:** Enter the total number of children in your household who need support.\n\n**Example:** 2' },
   // Per-child steps generated dynamically at runtime
-  { id: 'g1_name',           section: 1, type: 'text',   prompt: 'What is your full name?' },
-  { id: 'has_g2',            section: 1, type: 'radio',  prompt: 'Is there a second guardian?', options: ['Yes', 'No'] },
+  { id: 'g1_name',           section: 1, type: 'text',   prompt: 'What is your full name?', helpText: '**Format:** Firstname Lastname' },
+  { id: 'has_g2',            section: 1, type: 'radio',  prompt: 'Is there a second guardian?', options: ['Yes', 'No'], helpText: '**Explanation:** Indicate if another parent or legal guardian shares responsibility for the child in the same household.' },
   { id: 'g2_name',           section: 1, type: 'text',   prompt: 'What is the second guardian\'s full name?', skipIf: a => a['has_g2'] !== 'Yes' },
 
-  { id: 'addr_street',       section: 1, type: 'text',   prompt: 'What is your home address?' },
-  { id: 'addr_postal',       section: 1, type: 'text',   prompt: 'What is your postal code?' },
-  { id: 'addr_city',         section: 1, type: 'text',   prompt: 'What city do you live in?' },
-  { id: 'addr_apt',          section: 1, type: 'text',   prompt: 'What is your apartment number?', optional: true },
-  { id: 'addr_co',           section: 1, type: 'text',   prompt: 'What is your C/O address?', optional: true },
-  { id: 'contact_email',     section: 1, type: 'text',   prompt: 'What is your email address?' },
-  { id: 'contact_phone',     section: 1, type: 'text',   prompt: 'What is your phone number?' },
-  { id: 'bank_want',         section: 1, type: 'radio',  prompt: 'Would you like to provide bank details?', options: ['Yes', 'Skip'] },
-  { id: 'bank_name',         section: 1, type: 'text',   prompt: 'What is the name of your bank?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'addr_street',       section: 1, type: 'text',   prompt: 'What is your home address?', helpText: '**Example:** Storgatan 1' },
+  { id: 'addr_postal',       section: 1, type: 'text',   prompt: 'What is your postal code?', helpText: '**Format:** 123 45' },
+  { id: 'addr_city',         section: 1, type: 'text',   prompt: 'What city do you live in?', helpText: '**Example:** Stockholm' },
+  { id: 'addr_apt',          section: 1, type: 'text',   prompt: 'What is your apartment number?', optional: true, helpText: '**Optional:** Usually 4 digits, e.g. 1101' },
+  { id: 'addr_co',           section: 1, type: 'text',   prompt: 'What is your C/O address?', optional: true, helpText: '**Optional:** Care Of address if your mail goes to someone else.' },
+  { id: 'contact_email',     section: 1, type: 'text',   prompt: 'What is your email address?', helpText: '**Format:** name@example.com' },
+  { id: 'contact_phone',     section: 1, type: 'text',   prompt: 'What is your phone number?', helpText: '**Format:** 07X XXX XX XX' },
+  { id: 'bank_want',         section: 1, type: 'radio',  prompt: 'Would you like to provide bank details?', options: ['Yes', 'Skip'], helpText: '**Explanation:** Providing bank details allows for faster payout if your application is approved.' },
+  { id: 'bank_name',         section: 1, type: 'text',   prompt: 'What is the name of your bank?', skipIf: a => a['bank_want'] !== 'Yes', helpText: '**Example:** Swedbank, SEB, Handelsbanken' },
   { id: 'bank_holder',       section: 1, type: 'text',   prompt: 'What is the account holder\'s name?', skipIf: a => a['bank_want'] !== 'Yes' },
-  { id: 'bank_clearing',     section: 1, type: 'text',   prompt: 'What is the clearing number?', skipIf: a => a['bank_want'] !== 'Yes' },
+  { id: 'bank_clearing',     section: 1, type: 'text',   prompt: 'What is the clearing number?', skipIf: a => a['bank_want'] !== 'Yes', helpText: '**Format:** 4 digits (sometimes 5 for Swedbank)' },
   { id: 'bank_account',      section: 1, type: 'text',   prompt: 'What is the account number?', skipIf: a => a['bank_want'] !== 'Yes' },
 
   // ── SECTION 3: INCOME & SUPPORT ──
   { id: 'income_sources',    section: 2, type: 'multiselect', prompt: 'Which of the following income sources does your household receive?',
-    options: ['Salary', 'Child Allowance', 'Parental Benefit', 'Study Allowance', 'Maintenance Support', 'Care Allowance', 'Unemployment Benefit', 'Housing Allowance', 'Sickness Benefit', 'Income Support', 'Other Income'] },
+    options: ['Salary', 'Child Allowance', 'Parental Benefit', 'Study Allowance', 'Maintenance Support', 'Care Allowance', 'Unemployment Benefit', 'Housing Allowance', 'Sickness Benefit', 'Income Support', 'Other Income'], helpText: '**Explanation:** Select all that apply for all adults living in the household. This helps us calculate your total household income.' },
   // Amount steps generated dynamically based on income_sources selection
-  { id: 'support_situation', section: 2, type: 'text',   prompt: 'Please describe your family\'s current situation.' },
+  { id: 'support_situation', section: 2, type: 'text',   prompt: 'Please describe your family\'s current situation.', helpText: '**Guidance:** Briefly explain why you are applying for support and any special circumstances (e.g., recent job loss, illness).' },
   { id: 'support_type',      section: 2, type: 'select', prompt: 'What type of support are you requesting for the child?',
-    options: ['Football Shoes', 'School Equipment', 'Clothing', 'Bus Pass', 'Leisure Activity', 'Camp', 'Sports Membership', 'Other'] },
-  { id: 'support_desc',      section: 2, type: 'text',   prompt: 'Please describe the support being requested.' },
-  { id: 'support_benefit',   section: 2, type: 'text',   prompt: 'Why would this support benefit the child?' },
-  { id: 'support_more',      section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes', 'No'] },
+    options: ['Football Shoes', 'School Equipment', 'Clothing', 'Bus Pass', 'Leisure Activity', 'Camp', 'Sports Membership', 'Other'], helpText: '**Explanation:** Choose the primary category that fits the child\'s needs.' },
+  { id: 'support_desc',      section: 2, type: 'text',   prompt: 'Please describe the support being requested.', helpText: '**Example:** A pair of winter boots and a warm jacket for the upcoming season.' },
+  { id: 'support_benefit',   section: 2, type: 'text',   prompt: 'Why would this support benefit the child?', helpText: '**Explanation:** Explain how this specific item or activity will improve the child\'s well-being or daily life.' },
+  { id: 'support_more',      section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes', 'No'], helpText: '**Explanation:** You can request support for multiple items or activities for the same child.' },
 
   // ── SECTION 4: DOCUMENTS & REVIEW ──
-  { id: 'docs_upload',       section: 3, type: 'radio',  prompt: 'Would you like to upload any additional supporting documents?', options: ['Upload Document', 'Skip'] },
-  { id: 'docs_file',         section: 3, type: 'file',   prompt: 'Please upload the supporting document.', skipIf: a => a['docs_upload'] !== 'Upload Document' },
-  { id: 'review_info',       section: 3, type: 'info',   prompt: 'Please review the information collected. Your responses have been saved and are ready for submission.' },
-  { id: 'consent_data',      section: 3, type: 'radio',  prompt: 'Do you agree that Majblomman may process your personal data?', options: ['Yes', 'No'] },
-  { id: 'consent_accurate',  section: 3, type: 'radio',  prompt: 'Do you confirm that the information provided is accurate and supported by relevant documentation?', options: ['Yes', 'No'] },
+  { id: 'docs_upload',       section: 3, type: 'radio',  prompt: 'Would you like to upload any additional supporting documents?', options: ['Upload Document', 'Skip'], helpText: '**Explanation:** You can provide proof of income or other relevant documents to strengthen your application.' },
+  { id: 'docs_file',         section: 3, type: 'file',   prompt: 'Please upload the supporting document.', skipIf: a => a['docs_upload'] !== 'Upload Document', helpText: '**Format expected:** PDF, JPG, or PNG files up to 5MB.' },
+  { id: 'review_info',       section: 3, type: 'info',   prompt: 'Please review the information collected. Your responses have been saved and are ready for submission.', helpText: '**Guidance:** Click Continue to proceed to the final consent questions.' },
+  { id: 'consent_data',      section: 3, type: 'radio',  prompt: 'Do you agree that Majblomman may process your personal data?', options: ['Yes', 'No'], helpText: '**Explanation:** We need your consent to securely store and review your application under GDPR.' },
+  { id: 'consent_accurate',  section: 3, type: 'radio',  prompt: 'Do you confirm that the information provided is accurate and supported by relevant documentation?', options: ['Yes', 'No'], helpText: '**Explanation:** Giving false information may lead to rejection.' },
 ];
 
 // ─────────────────────────────────────────────
@@ -147,6 +147,15 @@ function getHelpAnswer(q: string): string {
     if (low.includes(k)) return v;
   }
   return "I'm here to help! Please ask any question about the Majblomman application process and I'll do my best to answer.";
+}
+
+function isHelpQuestion(q: string): boolean {
+  const low = q.toLowerCase();
+  if (low.includes('?')) return true;
+  for (const k of Object.keys(FAQ_ANSWERS)) {
+    if (low.includes(k)) return true;
+  }
+  return false;
 }
 
 // ─────────────────────────────────────────────
@@ -252,7 +261,7 @@ const TypingDots = () => (
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
-type Msg = { id: string; from: 'ai' | 'user'; text: string; time: string; options?: string[]; type?: QType; stepId?: string; };
+type Msg = { id: string; from: 'ai' | 'user'; text: string; time: string; options?: string[]; type?: QType; stepId?: string; helpText?: string; };
 
 export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlowProps) {
   const sections = language === 'en' ? SECTIONS_EN : SECTIONS_SV;
@@ -281,10 +290,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
   const [inputVal, setInputVal]       = useState('');
   const [selectVal, setSelectVal]     = useState('');
   const [multiSel, setMultiSel]       = useState<string[]>([]);
-
-  // Help panel
-  const [helpConv, setHelpConv]       = useState<Msg[]>([]);
-  const [helpInput, setHelpInput]     = useState('');
+  const [expandedHelpMsgId, setExpandedHelpMsgId] = useState<string | null>(null);
 
   // Support request loop tracking
   const [supportRound, setSupportRound] = useState(1);
@@ -362,7 +368,6 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
   }, []);
 
   useEffect(() => { convEndRef.current?.scrollIntoView({ behavior:'smooth' }); }, [conv, typing]);
-  useEffect(() => { helpEndRef.current?.scrollIntoView({ behavior:'smooth' }); }, [helpConv]);
 
   // Each mount of ChatFlow gets its own session key so a reset (key change)
   // always starts from a completely blank slate — never inheriting old progress.
@@ -394,16 +399,16 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       // After child_count, insert per-child questions
       if (step.id === 'child_count') {
         for (let ci = 1; ci <= count; ci++) {
-          result.push({ id: `child_${ci}_name`, section: 1, type: 'text', prompt: `What is child ${ci}'s full name?` });
-          result.push({ id: `child_${ci}_idtype`, section: 1, type: 'radio', prompt: `Which identification type does child ${ci} have?`, options: ['Personal Identity Number','Coordination Number','LMA Number','Other'] });
-          result.push({ id: `child_${ci}_idnum`, section: 1, type: 'text',  prompt: `Please enter the identification number for child ${ci}.` });
+          result.push({ id: `child_${ci}_name`, section: 1, type: 'text', prompt: `What is child ${ci}'s full name?`, helpText: '**Format:** Firstname Lastname' });
+          result.push({ id: `child_${ci}_idtype`, section: 1, type: 'radio', prompt: `Which identification type does child ${ci} have?`, options: ['Personal Identity Number','Coordination Number','LMA Number','Other'], helpText: '**Explanation:** Choose the formal ID type used for the child in Sweden.' });
+          result.push({ id: `child_${ci}_idnum`, section: 1, type: 'text',  prompt: `Please enter the identification number for child ${ci}.`, helpText: '**Format expected:** 10 or 12 digits, e.g., 20100101-1234' });
         }
       }
 
       // After income_sources, insert amount questions for each selected source
       if (step.id === 'income_sources' && incSources.length > 0) {
         for (const src of incSources) {
-          result.push({ id: `income_amt_${src.replace(/\s+/g,'_').toLowerCase()}`, section: 2, type: 'text', prompt: `Please enter the monthly amount received for "${src}" (SEK).` });
+          result.push({ id: `income_amt_${src.replace(/\s+/g,'_').toLowerCase()}`, section: 2, type: 'text', prompt: `Please enter the monthly amount received for "${src}" (SEK).`, helpText: '**Format:** Numeric amount only, e.g., 5000' });
         }
       }
 
@@ -446,6 +451,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
         options: step.options,
         type: step.type,
         stepId: step.id,
+        helpText: step.helpText || "**Guidance:** Please answer the question to the best of your ability.",
       }]);
     }, 750);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -492,6 +498,27 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
 
     const displayValue = Array.isArray(value) ? value.join(', ') : value;
 
+    // Intercept help questions
+    if (typeof value === 'string' && isHelpQuestion(value)) {
+      setConv(prev => [
+        ...prev, 
+        { id: uid(), from: 'user', time: ts(), text: value },
+        { id: uid(), from: 'ai', time: ts(), text: getHelpAnswer(value) }
+      ]);
+      setInputVal('');
+      // Re-ask the current question after a short delay
+      setTimeout(() => {
+        setConv(prev => [...prev, {
+          id: uid(), from: 'ai', time: ts(),
+          text: step.prompt,
+          options: step.options,
+          type: step.type,
+          stepId: step.id,
+        }]);
+      }, 1500);
+      return;
+    }
+
     // Save
     const newAns = { ...answers, [step.id]: value };
     setAnswers(newAns);
@@ -515,10 +542,10 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
       const nextRound = supportRound + 1;
       setSupportRound(nextRound);
       const extraSteps: Step[] = [
-        { id: `support_type_${nextRound}`,    section: 2, type: 'select', prompt: `What type of support are you requesting? (Request ${nextRound})`, options: ['Football Shoes','School Equipment','Clothing','Bus Pass','Leisure Activity','Camp','Sports Membership','Other'] },
-        { id: `support_desc_${nextRound}`,    section: 2, type: 'text',   prompt: `Please describe the support being requested. (Request ${nextRound})` },
-        { id: `support_benefit_${nextRound}`, section: 2, type: 'text',   prompt: `Why would this support benefit the child? (Request ${nextRound})` },
-        { id: `support_more_${nextRound}`,    section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes','No'] },
+        { id: `support_type_${nextRound}`,    section: 2, type: 'select', prompt: `What type of support are you requesting? (Request ${nextRound})`, options: ['Football Shoes','School Equipment','Clothing','Bus Pass','Leisure Activity','Camp','Sports Membership','Other'], helpText: '**Explanation:** Choose the primary category that fits the additional request.' },
+        { id: `support_desc_${nextRound}`,    section: 2, type: 'text',   prompt: `Please describe the support being requested. (Request ${nextRound})`, helpText: '**Example:** Registration fee for the local soccer club.' },
+        { id: `support_benefit_${nextRound}`, section: 2, type: 'text',   prompt: `Why would this support benefit the child? (Request ${nextRound})`, helpText: '**Explanation:** Explain how it will improve their well-being.' },
+        { id: `support_more_${nextRound}`,    section: 2, type: 'radio',  prompt: 'Would you like to add another support request?', options: ['Yes','No'], helpText: '**Explanation:** You can keep adding as many requests as needed.' },
       ];
       const insertAt = stepIdx + 1;
       const spliced = [...newSteps.slice(0, insertAt), ...extraSteps, ...newSteps.slice(insertAt)];
@@ -561,23 +588,12 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
   const activeStepId = lastAiMsg?.stepId;
   const activeStep = steps.find(s => s.id === activeStepId) || currentStep;
 
-  // ── Help assistant ──
-  const submitHelp = (q?: string) => {
-    const query = q ?? helpInput.trim();
-    if (!query) return;
-    setHelpConv(prev => [...prev, { id: uid(), from: 'user', time: ts(), text: query }]);
-    setHelpInput('');
-    setTimeout(() => {
-      setHelpConv(prev => [...prev, { id: uid(), from: 'ai', time: ts(), text: getHelpAnswer(query) }]);
-    }, 500);
-  };
-
   // ─────────────────────────────────────────────
   // RENDER
   // ─────────────────────────────────────────────
   return (
     <div style={{ fontFamily:"'Plus Jakarta Sans', system-ui, sans-serif" }} className="w-full">
-      <div className="max-w-[1280px] mx-auto px-4 pt-5 pb-4 grid grid-cols-[260px_1fr_260px] gap-4 h-[calc(100vh-140px)] min-h-[600px]">
+      <div className="w-full max-w-[1400px] mx-auto px-6 pt-5 pb-4 grid grid-cols-[280px_1fr] gap-6 h-[calc(100vh-140px)] min-h-[600px]">
 
         {/* ══ LEFT: Application Progress ══ */}
         <aside className="bg-white rounded-2xl shadow-sm border border-[#e8e8f0] flex flex-col overflow-hidden">
@@ -624,6 +640,17 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
               <p className="text-xs text-[#6b7280]">{progressPct === 0 ? "Let's get started!" : progressPct < 100 ? 'Keep going!' : 'All done! 🎉'}</p>
             </div>
           </div>
+          
+          {/* Save & Continue Later Button */}
+          <div className="p-3 border-t border-[#f0f0f8] mt-auto">
+            <button 
+              onClick={() => alert("Your progress has been safely saved! You can close this window and return later to finish your application.")}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-[#e8e8f4] bg-[#fafafe] hover:border-[#5b5ef4] hover:text-[#5b5ef4] hover:bg-[#f0f0ff] transition-all text-[13px] text-[#3a3a5c] font-semibold shadow-sm"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Save & Continue Later
+            </button>
+          </div>
         </aside>
 
         {/* ══ CENTER: AI Guided Application ══ */}
@@ -632,26 +659,14 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
           <div className="px-5 pt-4 pb-3 border-b border-[#f0f0f8]">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-[#5b5ef4] uppercase tracking-wider">{sections[activeSection]}</p>
-              {/* Text / Voice toggle */}
-              <div className="flex items-center gap-1 bg-[#f0f0ff] rounded-xl p-0.5">
-                <button
-                  onClick={() => setVoiceMode(false)}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[12px] font-semibold transition-all ${
-                    !voiceMode ? 'bg-white text-[#5b5ef4] shadow-sm' : 'text-[#9090b0] hover:text-[#5b5ef4]'
-                  }`}
+              {/* Text Mode */}
+              <div className="flex items-center gap-1">
+                <div
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[12px] font-semibold text-[#5b5ef4]"
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   Text
-                </button>
-                <button
-                  onClick={() => setVoiceMode(true)}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[12px] font-semibold transition-all ${
-                    voiceMode ? 'bg-white text-[#5b5ef4] shadow-sm' : 'text-[#9090b0] hover:text-[#5b5ef4]'
-                  }`}
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                  Voice
-                </button>
+                </div>
               </div>
             </div>
 
@@ -667,12 +682,66 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                 >
                   {msg.from==='ai' ? <BotBubbleIcon /> : <UserAvatar />}
                   <div className={`max-w-[75%] flex flex-col ${msg.from==='user'?'items-end':'items-start'}`}>
-                    <div className={`px-4 py-3 rounded-2xl text-[13.5px] leading-relaxed whitespace-pre-line shadow-sm ${
+                    <div className={`px-4 py-3 rounded-2xl text-[13.5px] leading-relaxed whitespace-pre-line shadow-sm relative ${
                       msg.from==='ai'
-                        ? 'bg-[#f7f7ff] text-[#1a1a2e] rounded-bl-sm border border-[#ededff]'
+                        ? 'bg-[#f7f7ff] text-[#1a1a2e] rounded-bl-sm border border-[#ededff] pr-10'
                         : 'bg-[#5b5ef4] text-white rounded-br-sm'
                     }`}>
                       {msg.text}
+                      
+                      {/* Info Icon for Explanation Toggle */}
+                      {msg.from==='ai' && msg.helpText && (
+                        <button
+                          onClick={() => setExpandedHelpMsgId(expandedHelpMsgId === msg.id ? null : msg.id)}
+                          className={`absolute right-3 top-3 transition-colors bg-white rounded-full p-0.5 shadow-sm border ${
+                            expandedHelpMsgId === msg.id ? 'border-[#5b5ef4] text-[#5b5ef4]' : 'border-[#e8e8f4] text-[#b0b0c8] hover:text-[#5b5ef4]'
+                          }`}
+                          title="Click to view explanation, format, and examples"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        </button>
+                      )}
+
+                      {/* Inline Help Box */}
+                      <AnimatePresence>
+                        {expandedHelpMsgId === msg.id && msg.helpText && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                            animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
+                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="bg-white border border-[#e8e8f4] rounded-xl p-3 text-[12.5px] text-[#3a3a5c]">
+                              <div className="font-semibold text-[#1a1a2e] mb-1.5 flex justify-between items-center">
+                                <span className="flex items-center gap-1.5">
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3.5 h-3.5 text-[#5b5ef4]"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                  Guidance
+                                </span>
+                                <button onClick={() => setExpandedHelpMsgId(null)} className="text-[#b0b0c8] hover:text-[#1a1a2e] transition-colors"><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                              </div>
+                              <div className="whitespace-pre-wrap leading-relaxed space-y-1">
+                                {msg.helpText.split('\n\n').map((block, i) => {
+                                  const isBold = block.startsWith('**');
+                                  if (isBold) {
+                                    const titleEnd = block.indexOf('**', 2);
+                                    if (titleEnd > -1) {
+                                      const title = block.substring(2, titleEnd);
+                                      const rest = block.substring(titleEnd + 2);
+                                      return (
+                                        <div key={i} className="mb-1">
+                                          <span className="font-bold text-[#1a1a2e]">{title}</span>
+                                          <span>{rest}</span>
+                                        </div>
+                                      );
+                                    }
+                                  }
+                                  return <div key={i} className="mb-1">{block}</div>;
+                                })}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Inline radio buttons */}
                       {msg.from==='ai' && msg.type==='radio' && msg.options && msg.stepId===activeStepId && (
@@ -816,6 +885,7 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
                         else if (activeStep.optional) submitAnswer('');
                       }
                     }}/>
+                    
                   {/* Mic button — active in all modes but especially useful in voice mode */}
                   <button
                     onClick={() => isListening ? stopListening() : startListening()}
@@ -867,66 +937,6 @@ export function ChatFlow({ formData, updateData, onComplete, language }: ChatFlo
             <LockIcon/> Your information is saved securely and encrypted.
           </div>
         </section>
-
-        {/* ══ RIGHT: Help Assistant ══ */}
-        <aside className="bg-white rounded-2xl shadow-sm border border-[#e8e8f0] flex flex-col overflow-hidden">
-          <div className="p-5 pb-0">
-            <h2 className="text-[15px] font-semibold text-[#1a1a2e] mb-1">Majblomman Assistant</h2>
-          </div>
-
-          {helpConv.length === 0 ? (
-            <div className="flex flex-col items-center text-center px-5 pt-4 pb-2">
-              <BotAvatar/>
-              <p className="text-[13px] text-[#6b7280] leading-snug">
-                I'm here to help! Ask me anything about the application process.
-              </p>
-            </div>
-          ) : (
-            <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
-              <AnimatePresence initial={false}>
-                {helpConv.map(msg => (
-                  <motion.div key={msg.id}
-                    initial={{opacity:0,y:6}} animate={{opacity:1,y:0}} transition={{duration:0.2}}
-                    className={`flex items-end gap-1.5 ${msg.from==='user'?'flex-row-reverse':''}`}
-                  >
-                    {msg.from==='ai' ? <BotBubbleIcon/> : <UserAvatar/>}
-                    <div className={`max-w-[80%] px-3 py-2 rounded-xl text-[12.5px] leading-relaxed shadow-sm ${
-                      msg.from==='ai'
-                        ? 'bg-[#f7f7ff] text-[#1a1a2e] border border-[#ededff] rounded-bl-sm'
-                        : 'bg-[#5b5ef4] text-white rounded-br-sm'
-                    }`}>{msg.text}</div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              <div ref={helpEndRef}/>
-            </div>
-          )}
-
-          {/* Quick question pills */}
-          <div className="px-3 pb-2 space-y-1.5 mt-auto">
-            {quickQs.map((q, i) => (
-              <button key={i} onClick={() => submitHelp(q)}
-                className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-[#e8e8f4] bg-[#fafafe] hover:border-[#5b5ef4] hover:bg-[#f0f0ff] transition-all text-[12.5px] text-[#3a3a5c] font-medium">
-                <span>{q}</span><ChevronRight/>
-              </button>
-            ))}
-          </div>
-
-          {/* Help input */}
-          <div className="p-3 border-t border-[#f0f0f8]">
-            <div className="flex items-center gap-2 bg-[#f7f7ff] border border-[#e8e8f4] rounded-xl px-3 py-2">
-              <input className="flex-1 bg-transparent text-[12.5px] text-[#1a1a2e] placeholder-[#b0b0c8] focus:outline-none"
-                placeholder="Ask a question…"
-                value={helpInput}
-                onChange={e => setHelpInput(e.target.value)}
-                onKeyDown={e => e.key==='Enter' && submitHelp()}/>
-              <button disabled={!helpInput.trim()} onClick={() => submitHelp()}
-                className="w-7 h-7 rounded-lg bg-[#5b5ef4] text-white flex items-center justify-center disabled:opacity-40 hover:bg-[#4a4de0] transition-colors">
-                <SendIcon/>
-              </button>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );
